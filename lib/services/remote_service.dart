@@ -1,5 +1,7 @@
 // ignore_for_file: body_might_complete_normally_nullable
 
+import 'dart:async';
+
 import 'package:api_demo/models/post.dart';
 import 'package:http/http.dart' as http;
 

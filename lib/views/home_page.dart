@@ -1,6 +1,9 @@
-import 'package:api_demo/models/post.dart';
-import 'package:api_demo/services/remote_service.dart';
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 import 'package:flutter/material.dart';
+import 'comments_screen.dart';
+import 'posts_screen.dart';
+import 'photos_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -9,79 +12,46 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  List<Post>? posts;
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   var isLoaded = false;
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    getData();
-  }
-
-  getData() async {
-    posts = await RemoteService().getPosts();
-    if (posts != null) {
-      setState(() {
-        isLoaded = true;
-      });
-    }
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Posts'),
+        title: const Text(
+          'Tab Bar',
+          style: TextStyle(
+            color: Colors.black45,
+            fontSize: 22,
+          ),
+        ),
+        backgroundColor: Color.fromARGB(255, 237, 184, 247),
         centerTitle: true,
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'Posts'),
+            Tab(text: 'Photos'),
+            Tab(text: 'Comments'),
+          ],
+        ),
       ),
-      body: Visibility(
-        visible: isLoaded,
-        child: ListView.builder(
-          itemCount: posts?.length,
-          itemBuilder: (context, index) {
-            return Container(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Container(
-                    height: 50,
-                    width: 50,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: Colors.grey[300],
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          posts![index].title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          posts![index].body ?? '',
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-        replacement: const Center(
-          child: CircularProgressIndicator(),
-        ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          PostScreen(),
+          PhotoScreen(),
+          CommentScreen(),
+        ],
       ),
     );
   }
